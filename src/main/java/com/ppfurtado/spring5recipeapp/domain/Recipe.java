@@ -1,9 +1,17 @@
 package com.ppfurtado.spring5recipeapp.domain;
 
+import lombok.*;
+import org.hibernate.Hibernate;
+
 import javax.persistence.*;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
+@Getter
+@Setter
+@ToString
+@RequiredArgsConstructor
 @Entity
 public class Recipe {
 
@@ -22,6 +30,7 @@ public class Recipe {
     private String directions;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "recipe")
+    @ToString.Exclude
     private Set<Ingredient> ingredients = new HashSet<>( );
 
     @Lob
@@ -37,6 +46,7 @@ public class Recipe {
     @JoinTable(name = "recipe_category",
             joinColumns = @JoinColumn(name = "recipe_id"),
             inverseJoinColumns = @JoinColumn(name = "category_id"))
+    @ToString.Exclude
     private Set<Category> categories = new HashSet<>();
 
     public void setNotes(Notes notes) {
@@ -50,27 +60,17 @@ public class Recipe {
         return this;
     }
 
-    public Set<Ingredient> getIngredients() {
-        return ingredients;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+        Recipe recipe = (Recipe) o;
+        return id != null && Objects.equals(id, recipe.id);
     }
 
-    public void setIngredients(Set<Ingredient> ingredients) {
-        this.ingredients = ingredients;
-    }
-
-    public Difficulty getDifficulty() {
-        return difficulty;
-    }
-
-    public void setDifficulty(Difficulty difficulty) {
-        this.difficulty = difficulty;
-    }
-
-    public Set<Category> getCategories() {
-        return categories;
-    }
-
-    public void setCategories(Set<Category> categories) {
-        this.categories = categories;
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
     }
 }
